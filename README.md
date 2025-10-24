@@ -14,6 +14,7 @@ A full-stack application with React + Vite frontend and Node.js backend.
 - 🎯 Counter button interface
 - 🔌 Express.js backend API
 - 📊 API integration with example data
+- 🧪 Playwright end-to-end testing
 
 ## Prerequisites
 
@@ -79,3 +80,38 @@ cd frontend
 npm run build
 npm run preview
 ```
+
+## Testing
+
+The frontend includes a comprehensive Playwright test suite.
+
+### Running Tests
+
+1. Install Playwright browsers (first time only):
+   ```bash
+   cd frontend
+   npx playwright install
+   ```
+
+2. Run tests:
+   ```bash
+   cd frontend
+   npm test
+   ```
+
+3. Run tests with UI mode:
+   ```bash
+   cd frontend
+   npm run test:ui
+   ```
+
+For more information about the test suite, see [frontend/tests/README.md](frontend/tests/README.md).
+
+### Test Coverage
+
+The test suite includes:
+- Basic UI element rendering and interactions
+- Counter button functionality
+- API data fetching with mocked responses
+- Loading and error state handling
+- External link validation
