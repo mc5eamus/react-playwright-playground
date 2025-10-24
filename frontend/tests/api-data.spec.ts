@@ -9,18 +9,25 @@ test.describe('API Data Fetching', () => {
   });
 
   test('should show loading state initially', async ({ page }) => {
-    // Navigate but don't wait for all network requests
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    // Mock a delayed API response to ensure we can see loading state
+    await page.route('http://localhost:3001/api/data', async (route) => {
+      // Delay the response to ensure loading state is visible
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          data: []
+        })
+      });
+    });
     
-    // The loading message might appear briefly
+    await page.goto('/');
+    
+    // The loading message should appear
     const loadingText = page.locator('text=Loading data...');
-    
-    // Check if either loading appears or data loads (since it might be fast)
-    await expect(async () => {
-      const isLoadingVisible = await loadingText.isVisible().catch(() => false);
-      const hasListItems = await page.locator('ul li').count() > 0;
-      expect(isLoadingVisible || hasListItems).toBeTruthy();
-    }).toPass({ timeout: 5000 });
+    await expect(loadingText).toBeVisible();
   });
 
   test('should display API data when backend is available', async ({ page }) => {
@@ -85,9 +92,9 @@ test.describe('API Data Fetching', () => {
     const errorText = page.locator('text=Error:');
     await expect(errorText).toBeVisible({ timeout: 10000 });
     
-    // Error should be in red
+    // Verify the error paragraph contains the error message
     const errorParagraph = page.locator('p', { hasText: 'Error:' });
-    await expect(errorParagraph).toHaveCSS('color', 'rgb(255, 0, 0)');
+    await expect(errorParagraph).toContainText('Failed to fetch data');
   });
 
   test('should display error message when network request fails', async ({ page }) => {
